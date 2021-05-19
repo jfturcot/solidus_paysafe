@@ -1,0 +1,12 @@
+/*
+Placeholder manifest file.
+the installer will append this file to the app vendored assets here: 'vendor/assets/stylesheets/spree/backend/all.css'
+*/
+.paysafe-field {
+  padding: 0.375rem 0.75rem;
+  color: #24282F;
+  border: 1px solid #D7DAE0;
+  border-radius: 3px;
+  background: #fff;
+  height: 30px;
+}

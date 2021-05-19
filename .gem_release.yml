@@ -1,0 +1,5 @@
+bump:
+  recurse: false
+  file: 'lib/solidus_paysafe/version.rb'
+  message: Bump SolidusPaysafe to %{version}
+  tag: true
