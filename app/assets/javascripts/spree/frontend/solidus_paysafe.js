@@ -18,20 +18,20 @@ window.addEventListener('load', _event => {
         environment: paysafeSetup.dataset.environment,
         fields: {
           cardNumber: {
-            selector: "#card_number",
-            placeholder: "XXXX XXXX XXXX XXXX"
+            selector: '#card_number',
+            placeholder: paysafeSetup.dataset.cardNumberPlaceholder || '0000 0000 0000 0000'
           },
           expiryDate: {
-            selector: "#card_expiry",
-            placeholder: "XX/XX"
+            selector: '#card_expiry',
+            placeholder: paysafeSetup.dataset.expiryDatePlaceholder || 'MM / YY'
           },
           cvv: {
-            selector: "#card_code",
-            placeholder: "XXX"
+            selector: '#card_code',
+            placeholder: paysafeSetup.dataset.cvvPlaceholder || '000'
           }
         },
         style: {
-
+          // TODO: Add support for custom styling
         }
       },
       function(instance, error) {

@@ -4,6 +4,9 @@
   id: 'paysafe-setup',
   'data-token' => payment_method.gateway.single_use_token,
   'data-environment' => payment_method.gateway.test_mode ? 'TEST' : 'LIVE',
+  # 'data-card-number-placeholder' => t('spree.card_number'),
+  # 'data-expiry-date-placeholder' => t('spree.expiration'),
+  # 'data-cvv-placeholder' => t('spree.card_code')
 ) %>
 
 <%= image_tag 'credit_cards/credit_card.gif', id: 'credit-card-image' %>
