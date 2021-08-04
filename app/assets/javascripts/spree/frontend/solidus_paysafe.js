@@ -7,7 +7,9 @@ document.addEventListener('DOMContentLoaded', _event => {
   document.head.appendChild(paysafeScript);
 });
 
-window.addEventListener('load', _event => {
+const loadEvent = window.Turbolinks ? 'turbolinks:load' : 'load';
+
+window.addEventListener(loadEvent, _event => {
   const paysafeSetup = document.getElementById('paysafe-setup');
   if (paysafeSetup) {
     const form = paysafeSetup.closest('form');
