@@ -37,19 +37,9 @@ window.addEventListener('load', _event => {
             // TODO: Add support for custom styling
           }
         },
-        function(instance, error) {
-          const showError = (errorEvent) => {
-            paysafeSetup.dispatchEvent(errorEvent);
-
-            if (errorElement && submitButton) {
-              errorElement.innerText = errorEvent.detail.displayMessage;
-              errorElement.style.display = 'block';
-              submitButton.disabled = false;
-            }
-          }
-
+        (instance, error) => {
           if (error) {
-            showError(new CustomEvent('error', { detail: error }));
+            showError(new CustomEvent('error', { detail: error }), paysafeSetup, errorElement, submitButton);
           } else {
             form.onsubmit = (event) => {
               event.preventDefault();
@@ -63,7 +53,9 @@ window.addEventListener('load', _event => {
               instance.tokenize(
                 (_instance, tokenError, result) => {
                   if (tokenError) {
-                    showError(new CustomEvent('error', { detail: tokenError }));
+                    showError(
+                      new CustomEvent('error', { detail: tokenError }), paysafeSetup, errorElement, submitButton
+                    );
                   } else {
                     form.querySelector('input#cc_type').value = mapCC(instance.getCardBrand());
                     form.querySelector('input#encrypted_data').value = result.token;
@@ -79,6 +71,16 @@ window.addEventListener('load', _event => {
     }
   }
 });
+
+const showError = (errorEvent, paysafeSetup, errorElement, submitButton) => {
+  paysafeSetup.dispatchEvent(errorEvent);
+
+  if (errorElement && submitButton) {
+    errorElement.innerText = errorEvent.detail.displayMessage;
+    errorElement.style.display = 'block';
+    submitButton.disabled = false;
+  }
+}
 
 const mapCC = (ccType) => {
     if (ccType === 'MasterCard' || ccType === 'mastercard') {
