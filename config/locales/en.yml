@@ -5,3 +5,6 @@ en:
   activerecord:
     models:
       solidus_paysafe/payment_method: Paysafe
+    attributes:
+      solidus_paysafe/credit_card:
+        token: 'Authorization token for the credit card'
