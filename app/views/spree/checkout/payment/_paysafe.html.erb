@@ -39,6 +39,8 @@
   <%= link_to "(#{t('spree.what_is_this')})", spree.cvv_path, target: '_blank', "data-hook" => "cvv_link", id: "cvv_link" %>
 </div>
 
+<div id="card-errors" role="alert" style="display: none"></div>
+
 <% if @order.bill_address %>
   <%= fields_for "#{param_prefix}[address_attributes]", @order.bill_address do |f| %>
     <%= render partial: 'spree/address/form_hidden', locals: { form: f } %>

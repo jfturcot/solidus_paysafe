@@ -11,52 +11,72 @@ window.addEventListener('load', _event => {
   const paysafeSetup = document.getElementById('paysafe-setup');
   if (paysafeSetup) {
     const form = paysafeSetup.closest('form');
+    if (form) {
+      const errorElement = form.querySelector('#card-errors');
+      const submitButton = form.querySelector('input[type=submit]') || form.querySelector('button[type=submit]');
 
-    window.paysafe.fields.setup(
-      paysafeSetup.dataset.token,
-      {
-        environment: paysafeSetup.dataset.environment,
-        fields: {
-          cardNumber: {
-            selector: '#card_number',
-            placeholder: paysafeSetup.dataset.cardNumberPlaceholder || '0000 0000 0000 0000'
+      window.paysafe.fields.setup(
+        paysafeSetup.dataset.token,
+        {
+          environment: paysafeSetup.dataset.environment,
+          fields: {
+            cardNumber: {
+              selector: '#card_number',
+              placeholder: paysafeSetup.dataset.cardNumberPlaceholder || '0000 0000 0000 0000'
+            },
+            expiryDate: {
+              selector: '#card_expiry',
+              placeholder: paysafeSetup.dataset.expiryDatePlaceholder || 'MM / YY'
+            },
+            cvv: {
+              selector: '#card_code',
+              placeholder: paysafeSetup.dataset.cvvPlaceholder || '000'
+            }
           },
-          expiryDate: {
-            selector: '#card_expiry',
-            placeholder: paysafeSetup.dataset.expiryDatePlaceholder || 'MM / YY'
-          },
-          cvv: {
-            selector: '#card_code',
-            placeholder: paysafeSetup.dataset.cvvPlaceholder || '000'
+          style: {
+            // TODO: Add support for custom styling
           }
         },
-        style: {
-          // TODO: Add support for custom styling
-        }
-      },
-      function(instance, error) {
-        if (error) {
-          console.log(error)
-        } else {
-          form.onsubmit = (event) => {
-            event.preventDefault();
+        function(instance, error) {
+          const showError = (errorEvent) => {
+            paysafeSetup.dispatchEvent(errorEvent);
 
-            instance.tokenize(
-              (_instance, error, result) => {
-                if (error) {
-                  console.log(error);
-                } else {
-                  form.querySelector('input#cc_type').value = mapCC(instance.getCardBrand());
-                  form.querySelector('input#encrypted_data').value = result.token;
+            if (errorElement && submitButton) {
+              errorElement.innerText = errorEvent.detail.displayMessage;
+              errorElement.style.display = 'block';
+              submitButton.disabled = false;
+            }
+          }
 
-                  form.submit();
-                }
+          if (error) {
+            showError(new CustomEvent('error', { detail: error }));
+          } else {
+            form.onsubmit = (event) => {
+              event.preventDefault();
+
+              if (errorElement && submitButton) {
+                errorElement.style.display = 'none';
+                errorElement.innerText = '';
+                submitButton.disabled = true;
               }
-            )
+
+              instance.tokenize(
+                (_instance, tokenError, result) => {
+                  if (tokenError) {
+                    showError(new CustomEvent('error', { detail: tokenError }));
+                  } else {
+                    form.querySelector('input#cc_type').value = mapCC(instance.getCardBrand());
+                    form.querySelector('input#encrypted_data').value = result.token;
+
+                    form.submit();
+                  }
+                }
+              )
+            }
           }
         }
-      }
-    );
+      );
+    }
   }
 });
 
