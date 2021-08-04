@@ -78,7 +78,11 @@ const showError = (errorEvent, paysafeSetup, errorElement, submitButton) => {
   if (errorElement && submitButton) {
     errorElement.innerText = errorEvent.detail.displayMessage;
     errorElement.style.display = 'block';
-    submitButton.disabled = false;
+
+    setTimeout(
+      () => submitButton.disabled = false
+      , 100
+    );
   }
 }
 
