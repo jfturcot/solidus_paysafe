@@ -1,15 +1,12 @@
 // Placeholder manifest file.
 // the installer will append this file to the app vendored assets here: vendor/assets/javascripts/spree/frontend/all.js'
-document.addEventListener('DOMContentLoaded', _event => {
-  const paysafeScript = document.createElement('script');
-  paysafeScript.src = 'https://hosted.paysafe.com/js/v1/latest/paysafe.min.js';
-  paysafeScript.async = false;
-  document.head.appendChild(paysafeScript);
-});
-
 const loadEvent = window.Turbolinks ? 'turbolinks:load' : 'load';
 
-window.addEventListener(loadEvent, _event => {
+document.addEventListener(loadEvent, _event => {
+  if (!window.paysafe) {
+    return console.error('Please include the paysafe.js script to the head your document.');
+  }
+
   const paysafeSetup = document.getElementById('paysafe-setup');
   if (paysafeSetup) {
     const form = paysafeSetup.closest('form');

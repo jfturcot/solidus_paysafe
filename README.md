@@ -19,9 +19,53 @@ Bundle your dependencies and run the installation generator:
 bin/rails generate solidus_paysafe:install
 ```
 
+Add the paysafe.js script to the head of your HTML:
+```html
+<script src="https://hosted.paysafe.com/js/v1/latest/paysafe.min.js"></script>
+```
+
 ## Usage
 
-<!-- Explain how to use your extension once it's been installed. -->
+Navigate to *Settings > Payments > Payment Methods* in the admin panel.
+You can now create a new payment method that uses Paysafe by selecting
+`Paysafe` under Type in the New Payment Method form and saving.
+The Paysafe payment method's extra fields will be now shown in the form.
+
+**Configure via database configuration**
+
+If you want to store your Paysafe credentials in the database just
+fill the new fields in the form, selecting `custom` (default) in the
+Preference Source field.
+
+**Configure via static configuration**
+
+If you want to store your credentials into your codebase or use ENV
+variables you can create the following static configuration:
+
+```ruby
+# config/initializers/spree.rb
+
+Spree.config do |config|
+  # ...
+
+  # The following example uses Rails credentials, you can also use ENV variables instead.
+  config.static_model_preferences.add(
+    SolidusPaysafe::PaymentMethod,
+    'paysafe_env_credentials',
+    test_mode: Rails.application.credentials.dig(:paysafe, :test_mode),
+    api_key: Rails.application.credentials.dig(:paysafe, :api_key),
+    api_secret: Rails.application.credentials.dig(:paysafe, :api_secret),
+    account_number: Rails.application.credentials.dig(:paysafe, :account_number),
+    single_use_token_key: Rails.application.credentials.dig(:paysafe, :single_use_token_key),
+    single_use_token_secret: Rails.application.credentials.dig(:paysafe, :single_use_token_secret)
+  )
+end
+```
+
+Once your server has been restarted, you can select in the Preference
+Source field a new entry called `paysafe_env_credentials`. After saving,
+your  application will start using the static configuration to process
+Paysafe payments.
 
 ## Development
 
