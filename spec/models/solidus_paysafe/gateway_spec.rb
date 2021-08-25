@@ -26,29 +26,37 @@ RSpec.describe SolidusPaysafe::Gateway do
   let(:payment) { ::Spree::Payment.new(state: 'completed', response_code: '123456') }
   let(:pending_payment) { ::Spree::Payment.new(state: 'pending', response_code: '654321') }
   let(:refund) { ::Spree::Refund.new(payment: payment) }
-  let(:options) { {
-    order_id: '123',
-    settle_with_auth: false,
-    billing_address: {
-      address1: '123 Street',
-      address2: 'Suite 666',
-      city: 'Montreal',
-      state: 'Quebec',
-      country: 'Canada',
-      zip: 'J1X 2X3',
-      phone: '514-555-5555'
-    },
-    shipping_address: {
-      recipientName: 'Jane Doe',
-      address1: '321 Street',
-      address2: 'Suite 123',
-      city: 'Montreal',
-      state: 'Quebec',
-      country: 'Canada',
-      zip: 'J9X 8X7',
-    },
-    originator: payment
-  } }
+  let(:options) do
+    {
+      order_id: '123',
+      settle_with_auth: false,
+      email: 'john@example.com',
+      customer: 'john@example.com',
+      customer_id: 1,
+      ip: '127.0.0.1',
+      billing_address: {
+        name: 'John Doe',
+        address1: '123 Street',
+        address2: 'Suite 666',
+        city: 'Montreal',
+        state: ::Spree::State.new(abbr: 'QC'),
+        zip: 'J1X 2X3',
+        country: ::Spree::Country.new(iso: 'CA'),
+        phone: '514-555-5555'
+      },
+      shipping_address: {
+        name: 'Jane Doe',
+        address1: '321 Street',
+        address2: 'Suite 123',
+        city: 'Los Angeles',
+        state: ::Spree::State.new(abbr: 'CA'),
+        zip: '90210',
+        country: ::Spree::Country.new(iso: 'USA'),
+        phone: '555-444-5555'
+      },
+      originator: payment
+    }
+  end
   let(:purchase_options) { options.merge(settle_with_auth: true) }
   let(:options_with_refund_originator) { options.merge(originator: refund) }
   let(:options_with_pending_payment_originator) { options.merge(originator: pending_payment) }
@@ -107,9 +115,38 @@ RSpec.describe SolidusPaysafe::Gateway do
       end
 
       it 'builds the proper authorization data' do
-        expect(card_payments).to receive(:create_authorization).with(
-          gateway.send :build_authorization_data, money, credit_card, options
-        )
+        auth_data = gateway.send :build_authorization_data, money, credit_card, options
+        expect(auth_data).to eq({
+          merchant_ref_num: '123',
+          amount: money,
+          settle_with_auth: false,
+          card: { payment_token: credit_card.token },
+          profile: {
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'john@example.com'
+          },
+          customer_ip: '127.0.0.1',
+          billing_details: {
+            street: '123 Street',
+            street2: 'Suite 666',
+            city: 'Montreal',
+            state: 'QC',
+            zip: 'J1X 2X3',
+            country: 'CA',
+            phone: '514-555-5555'
+          },
+          shipping_details: {
+            recipientName: 'Jane Doe',
+            street: '321 Street',
+            street2: 'Suite 123',
+            city: 'Los Angeles',
+            state: 'CA',
+            zip: '90210',
+            country: 'USA'
+          }
+        })
+        expect(card_payments).to receive(:create_authorization).with(auth_data)
         gateway.authorize(money, credit_card, options)
       end
 

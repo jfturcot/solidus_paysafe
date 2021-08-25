@@ -91,17 +91,17 @@ module SolidusPaysafe
     def void(transaction_id, options = {})
       payment = options[:originator]
 
-      if payment.completed?
-        status = client.card_payments.cancel_settlement(
-          settlement_id: transaction_id
-        ).status
-      else
-        status = client.card_payments.void_authorization(
-          auth_id: transaction_id,
-          merchant_ref_num: payment.order_id,
-          amount: payment.money.cents
-        ).status
-      end
+      status = if payment.completed?
+                 client.card_payments.cancel_settlement(
+                   settlement_id: transaction_id
+                 ).status
+               else
+                 client.card_payments.void_authorization(
+                   auth_id: transaction_id,
+                   merchant_ref_num: payment.order_id,
+                   amount: payment.money.cents
+                 ).status
+               end
 
       ActiveMerchant::Billing::Response.new(
         true,
@@ -160,12 +160,18 @@ module SolidusPaysafe
         amount: money,
         settle_with_auth: options[:settle_with_auth],
         card: { payment_token: credit_card.token },
+        profile: {
+          firstName: ::Spree::Address::Name.new(options[:billing_address][:name]).first_name,
+          lastName: ::Spree::Address::Name.new(options[:billing_address][:name]).last_name,
+          email: options[:email]
+        },
+        customer_ip: options[:ip],
         billing_details: {
           street: options[:billing_address][:address1],
           street2: options[:billing_address][:address2],
           city: options[:billing_address][:city],
-          state: options[:billing_address][:state],
-          country: options[:billing_address][:country],
+          state: options[:billing_address][:state]&.abbr,
+          country: options[:billing_address][:country]&.iso,
           zip: options[:billing_address][:zip],
           phone: options[:billing_address][:phone]
         },
@@ -174,8 +180,8 @@ module SolidusPaysafe
           street: options[:shipping_address][:address1],
           street2: options[:shipping_address][:address2],
           city: options[:shipping_address][:city],
-          state: options[:shipping_address][:state],
-          country: options[:shipping_address][:country],
+          state: options[:shipping_address][:state]&.abbr,
+          country: options[:shipping_address][:country]&.iso,
           zip: options[:shipping_address][:zip]
         }
       }
