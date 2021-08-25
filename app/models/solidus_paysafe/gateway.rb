@@ -170,8 +170,8 @@ module SolidusPaysafe
           street: options[:billing_address][:address1],
           street2: options[:billing_address][:address2],
           city: options[:billing_address][:city],
-          state: options[:billing_address][:state]&.abbr,
-          country: options[:billing_address][:country]&.iso,
+          state: options[:billing_address][:state],
+          country: options[:billing_address][:country],
           zip: options[:billing_address][:zip],
           phone: options[:billing_address][:phone]
         },
@@ -180,8 +180,8 @@ module SolidusPaysafe
           street: options[:shipping_address][:address1],
           street2: options[:shipping_address][:address2],
           city: options[:shipping_address][:city],
-          state: options[:shipping_address][:state]&.abbr,
-          country: options[:shipping_address][:country]&.iso,
+          state: options[:shipping_address][:state],
+          country: options[:shipping_address][:country],
           zip: options[:shipping_address][:zip]
         }
       }

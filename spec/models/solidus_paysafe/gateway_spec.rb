@@ -39,9 +39,9 @@ RSpec.describe SolidusPaysafe::Gateway do
         address1: '123 Street',
         address2: 'Suite 666',
         city: 'Montreal',
-        state: ::Spree::State.new(abbr: 'QC'),
+        state: 'QC',
         zip: 'J1X 2X3',
-        country: ::Spree::Country.new(iso: 'CA'),
+        country: 'CA',
         phone: '514-555-5555'
       },
       shipping_address: {
@@ -49,9 +49,9 @@ RSpec.describe SolidusPaysafe::Gateway do
         address1: '321 Street',
         address2: 'Suite 123',
         city: 'Los Angeles',
-        state: ::Spree::State.new(abbr: 'CA'),
+        state: 'CA',
         zip: '90210',
-        country: ::Spree::Country.new(iso: 'USA'),
+        country: 'USA',
         phone: '555-444-5555'
       },
       originator: payment
